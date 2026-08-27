@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Chess H4ck</string>
+    <string name="accessibility_service_description">国际象棋悬浮辅助无障碍服务，用于在底层棋盘应用上自动模拟点击和走子。</string>
+</resources>
