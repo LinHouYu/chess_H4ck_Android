@@ -31,7 +31,7 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
     private lateinit var floatingMenuOverlay: FloatingMenuOverlay
 
     private val boardStateManager = BoardStateManager()
-    private val engine = StockfishEngine()
+    private lateinit var engine: StockfishEngine
     private val mainHandler = Handler(Looper.getMainLooper())
 
     private var isAutoPlay: Boolean = false
@@ -48,7 +48,7 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
         }
 
         try {
-            engine.setCallback(this)
+            engine = StockfishEngine(this, this)
 
             statusBarOverlay = StatusBarOverlay(this)
             statusBarOverlay.show()
@@ -88,7 +88,7 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
 
         val notification: Notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("国际象棋悬浮辅助运行中")
-            .setContentText("Stockfish 18 引擎已就绪")
+            .setContentText("Stockfish 18 原生满血引擎已就绪")
             .setSmallIcon(R.drawable.app_logo)
             .setOngoing(true)
             .build()
@@ -118,6 +118,11 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
         updateStatusAndAnalyze(action)
     }
 
+    /**
+     * 核心调度：严格敌我隔离
+     * - 轮到我方 (isBottomTurn == true): 请求 Stockfish 满血深度分析，输出走法与箭头
+     * - 轮到敌人 (isBottomTurn == false): 立即停止引擎计算 (不为敌人推演)，状态栏提示等待对手，清空箭头
+     */
     private fun updateStatusAndAnalyze(actionDesc: String) {
         val turnName = boardStateManager.getTurnName()
         val isBottom = boardStateManager.isBottomTurn()
@@ -125,9 +130,17 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
         statusBarOverlay.updateMode(boardStateManager.sandboxMode)
         statusBarOverlay.flashAction(actionDesc)
 
-        // Trigger Stockfish Engine Analysis
-        val fen = boardStateManager.getFen()
-        engine.requestAnalysis(fen, isBottom)
+        if (isBottom) {
+            // 轮到我方回合 -> 触发 Stockfish 深度运算
+            val fen = boardStateManager.getFen()
+            engine.requestAnalysis(fen, isBottom)
+        } else {
+            // 轮到敌人回合 -> 严格停算！绝不为敌人计算！清空棋盘推荐箭头
+            engine.stopAnalysis()
+            statusBarOverlay.updateAiAnalysis(null, "等待对手落子", isBottomTurn = false)
+            chessboardOverlay.chessboardView.setAiRecommendation(null, null)
+            chessboardOverlay.redraw()
+        }
     }
 
     override fun onAnalysisResult(
@@ -138,10 +151,17 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
     ) {
         mainHandler.post {
             val isBottom = boardStateManager.isBottomTurn()
-            statusBarOverlay.updateAiAnalysis(bestMoveUci, evalStr, isBottom)
+            if (!isBottom) {
+                // 收到回调但当前并非我方回合，安全丢弃，不显示任何敌方走法
+                statusBarOverlay.updateAiAnalysis(null, evalStr, isBottomTurn = false)
+                chessboardOverlay.chessboardView.setAiRecommendation(null, null)
+                return@post
+            }
+
+            statusBarOverlay.updateAiAnalysis(bestMoveUci, evalStr, isBottomTurn = true)
             chessboardOverlay.chessboardView.setAiRecommendation(fromSquare, toSquare)
 
-            if (isAutoPlay && isBottom && bestMoveUci != null && fromSquare != null && toSquare != null) {
+            if (isAutoPlay && bestMoveUci != null && fromSquare != null && toSquare != null) {
                 mainHandler.postDelayed({
                     if (isAutoPlay && boardStateManager.isBottomTurn()) {
                         performAiDirectMove(fromSquare, toSquare)
@@ -185,10 +205,11 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
 
     override fun onFlipBoard() {
         val flipped = chessboardOverlay.toggleFlip()
+        // 换边原则：无论如何翻转，屏幕下方的棋子就是我方
         boardStateManager.bottomColor = if (flipped) PieceColor.BLACK else PieceColor.WHITE
         chessboardOverlay.chessboardView.setAiRecommendation(null, null)
         chessboardOverlay.redraw()
-        val status = if (flipped) "视角翻转: AI执黑棋(底部)" else "视角还原: AI执白棋(底部)"
+        val status = if (flipped) "视角翻转: AI仅执黑棋(底部我方)" else "视角还原: AI仅执白棋(底部我方)"
         statusBarOverlay.flashAction(status)
         updateStatusAndAnalyze(status)
     }
@@ -204,6 +225,11 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
     }
 
     override fun onAiMove() {
+        if (!boardStateManager.isBottomTurn()) {
+            statusBarOverlay.flashAction("当前为对手回合，AI不走敌方棋子")
+            return
+        }
+
         val from = engine.latestFromSquare
         val to = engine.latestToSquare
         if (from != null && to != null) {
@@ -215,7 +241,7 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
 
     override fun onToggleAutoPlay() {
         isAutoPlay = !isAutoPlay
-        val status = if (isAutoPlay) "自动代走: 已开启" else "自动代走: 已停止"
+        val status = if (isAutoPlay) "自动代走: 已开启 (仅限我方回合)" else "自动代走: 已停止"
         statusBarOverlay.flashAction(status)
 
         if (isAutoPlay && boardStateManager.isBottomTurn()) {
@@ -248,6 +274,10 @@ class OverlayService : Service(), EngineCallback, FloatingMenuOverlay.MenuCallba
         super.onDestroy()
         instance = null
         isRunning = false
+
+        try {
+            engine.stop()
+        } catch (e: Exception) {}
 
         try {
             statusBarOverlay.hide()

@@ -58,7 +58,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="国际象棋 Stockfish 18 悬浮辅助"
+                        android:text="国际象棋 Stockfish 18 原生辅助"
                         android:textColor="#0284C7"
                         android:textSize="13sp"
                         android:textStyle="bold" />
@@ -67,13 +67,89 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="2dp"
-                        android:text="自由沙盒 · 智能推荐 · 触控挪子"
+                        android:text="满血算力 · 敌我隔离 · 自定义棋力"
                         android:textColor="#64748B"
                         android:textSize="11sp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 1: Permission Management -->
+            <!-- Card 1: Engine Strength Settings (New!) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_glass_card"
+                android:elevation="6dp"
+                android:orientation="vertical"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="🎯 Stockfish 棋力与算力调节"
+                    android:textColor="#0284C7"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="选择适合您的对弈与分析强度 (实时保存并生效)"
+                    android:textColor="#64748B"
+                    android:textSize="12sp" />
+
+                <RadioGroup
+                    android:id="@+id/rgSkillPreset"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp">
+
+                    <RadioButton
+                        android:id="@+id/rbGrandmaster"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="⚡ 特级宗师 (最高满血算力 · ELO 3500+)"
+                        android:textColor="#0F172A"
+                        android:textSize="13sp"
+                        android:textStyle="bold" />
+
+                    <RadioButton
+                        android:id="@+id/rbMaster"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="🏆 国际大师 (大师级水平 · ELO 2400)"
+                        android:textColor="#334155"
+                        android:textSize="13sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbAdvanced"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="🥇 俱乐部进阶 (进阶对战 · ELO 1800)"
+                        android:textColor="#334155"
+                        android:textSize="13sp" />
+
+                    <RadioButton
+                        android:id="@+id/rbCasual"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="6dp"
+                        android:paddingBottom="6dp"
+                        android:text="🎮 新手休闲 (基础练习 · ELO 1200)"
+                        android:textColor="#334155"
+                        android:textSize="13sp" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <!-- Card 2: Permission Management -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -137,7 +213,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Card 2: Floating Assistant Switch -->
+            <!-- Card 3: Floating Assistant Switch -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -168,7 +244,7 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Card 3: Feature Highlights -->
+            <!-- Card 4: Feature Highlights -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -181,7 +257,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="💡 功能特性速览"
+                    android:text="💡 核心特性速览"
                     android:textColor="#0284C7"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -191,10 +267,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
                     android:lineSpacingExtra="5dp"
-                    android:text="• 顶部状态栏：固定于手机最顶部，显示执棋方、AI最佳走法与局势评分。
-• 自由拉伸棋盘：按住顶部拖拽对齐底层游戏，按住右下角手柄随意缩放。
-• 可折叠控制面板：可任意拖拽停靠，支持重置、沙盒、翻转、AI代走、一键隐藏棋盘等 10 大快捷功能。
-• AI 执下原则：AI 始终操控屏幕下方的我方棋子，翻转视角后自动接管黑棋！"
+                    android:text="• 满血最高算力：默认开启 Stockfish 18 特级宗师级算力，支持 4 档棋力自定义调节。
+• 严格敌我隔离：AI 仅为我方（屏幕下方棋子）推演，对手回合自动停算，绝不帮敌人算棋！
+• 换边智能自适应：点击【翻转】后底部自动切换为黑棋，AI 自动转为只控制黑棋。
+• 三层独立悬浮窗：顶部状态栏 + 自由拉伸棋盘 + 可展开/拖拽 10 键快捷面板。"
                     android:textColor="#334155"
                     android:textSize="13sp" />
             </LinearLayout>

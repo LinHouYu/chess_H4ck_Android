@@ -4,16 +4,16 @@
 
   <img src="app/src/main/res/drawable/app_logo.png" alt="Chess H4ck Logo" width="128" height="128" />
 
-  <h3>🌟 全功能国际象棋悬浮辅助 · Stockfish 18 智能引擎 · 毛玻璃极简美学 🌟</h3>
+  <h3>🌟 官方 Stockfish 18 原生满血引擎 · 严格敌我隔离 · 自定义棋力 · 毛玻璃极简美学 🌟</h3>
 
   <p>
-    <b>专为 Android 移动设备与平板设计，支持对局分析、自由沙盒排局、AI 自动推演与局势评分</b>
+    <b>专为 Android 移动设备与平板深度定制，支持对局分析、自由沙盒排局、AI 自动推演与局势评分</b>
   </p>
 
   <p>
     <a href="https://github.com/LinHouYu/chess_H4ck_Android"><img src="https://img.shields.io/badge/Platform-Android_7.0%2B-38BDF8?logo=android&logoColor=white" alt="Platform" /></a>
     <a href="https://kotlinlang.org/"><img src="https://img.shields.io/badge/Language-Kotlin_2.0-7F52FF?logo=kotlin&logoColor=white" alt="Kotlin" /></a>
-    <a href="https://stockfishchess.org/"><img src="https://img.shields.io/badge/Engine-Stockfish_18-22C55E?logo=lichess&logoColor=white" alt="Stockfish" /></a>
+    <a href="https://stockfishchess.org/"><img src="https://img.shields.io/badge/Engine-Stockfish_18_ARMv8-22C55E?logo=lichess&logoColor=white" alt="Stockfish 18" /></a>
     <a href="#-许可证与免责声明-license--disclaimer"><img src="https://img.shields.io/badge/License-CC_BY--NC_4.0-E11D48?logo=creative-commons&logoColor=white" alt="License" /></a>
     <a href="#-许可证与免责声明-license--disclaimer"><img src="https://img.shields.io/badge/Usage-Non--Commercial_Only-F59E0B" alt="Non-Commercial" /></a>
   </p>
@@ -21,6 +21,7 @@
   <p>
     <a href="#-多平台版本导航-cross-platform">🌐 多平台版本</a> •
     <a href="#-核心亮点与特性">✨ 核心特性</a> •
+    <a href="#-引擎满血算力与自定义棋力">🎯 算力与棋力</a> •
     <a href="#-界面与动效美学">🎨 界面美学</a> •
     <a href="#-快捷控制面板一览">🎛️ 快捷功能</a> •
     <a href="#-安装与使用教程">📖 使用教程</a> •
@@ -39,30 +40,47 @@
 
 | 平台版本 | 官方仓库地址 | 核心特色与技术栈 |
 | :--- | :--- | :--- |
-| 📱 **Android 移动版 (当前项目)** | 🔗 **[chess_H4ck_Android](https://github.com/LinHouYu/chess_H4ck_Android)** | **免无障碍权限**、三层独立悬浮窗、自由拖拽拉伸、**毛玻璃 UI + 象棋 Emoji 唯美飘雪背景**（Kotlin + Stockfish 18） |
-| 💻 **Windows 桌面版** | 🔗 **[chess_H4ck_Windows](https://github.com/LinHouYu/chess_H4ck_Windows/tree/main)** | 原生 Win32 穿透自动化、多线程非阻塞深度计算、无级缩放与全键盘快捷键操控（Python + Tkinter + Stockfish） |
+| 📱 **Android 移动版 (当前项目)** | 🔗 **[chess_H4ck_Android](https://github.com/LinHouYu/chess_H4ck_Android)** | **官方 Stockfish 18 原生 ARMv8 满血引擎**、**免无障碍权限**、三层独立悬浮窗、自由拖拽拉伸、**毛玻璃 UI + 象棋 Emoji 唯美飘雪背景** |
+| 💻 **Windows 桌面版** | 🔗 **[chess_H4ck_Windows](https://github.com/LinHouYu/chess_H4ck_Windows/tree/main)** | 原生 Win32 穿透自动化、Python + Stockfish AVX2 多线程非阻塞深度计算、无级缩放与全键盘快捷键操控 |
 
 ---
 
 ## ✨ 核心亮点与特性
 
+- 🧠 **官方 Stockfish 18 原生 C++ 引擎驱动**：
+  - 基于官方编译的 `stockfish-android-armv8` (及 ARMv7) 原生二进制，通过标准 UCI 协议高并发管道通信，绝非简易手写小引擎！
+- ⚡ **默认满血最高算力 (ELO 3500+ 特级宗师)**：
+  - 默认开启最高级别算力（`Skill Level = 20`, `Threads = 4`, `Hash = 64MB`, `Depth = 22+`，思考时间动态加深），释放真实顶峰统治力。
+- 🛡️ **严格敌我计算隔离（仅算我方，绝不算敌人）**：
+  - **我方回合（屏幕下方棋子 / `isBottomTurn == true`）**：调用 Stockfish 进行深度推演并实时显示最佳走步与战术箭头。
+  - **敌人回合（屏幕上方棋子 / `isBottomTurn == false`）**：引擎立即自动停止计算，状态栏显示 `AI: 等待对手落子...`，清空推荐箭头，**绝对不为敌人推演任何走法**！
+  - **换边自适应**：无论如何翻转视角，AI 始终只为底部的我方服务。
+- 🎯 **APP 主界面自由自定义棋力调节**：
+  - 内置 4 档快捷预设（⚡ **特级宗师**、🏆 **国际大师**、🥇 **俱乐部进阶**、🎮 **新手休闲**），支持一键切换并全局持久化存储。
 - 🪟 **三层独立悬浮架构**：
-  - **顶部固定状态栏**：紧凑固定于屏幕最顶部，不可移动，实时清晰呈现当前执棋方、模式、最佳走法（如 `e2 -> e4`）与局势评分（如 `+1.85` / `杀棋 #2`）。
-  - **自由拖拽拉伸棋盘**：半透明背景不遮挡游戏画面，按住顶部把手可在游戏上方自由拖动对齐，按住右下角手柄可随意无级拉伸放大与缩小。
-  - **可折叠悬浮快捷球**：折叠时仅占用 54dp 边缘空间，展开即呈现 10 大功能的双行面板，展开状态下**按住标题栏仍可自由拖动全屏停靠**。
-- ⚡ **纯净免权限架构（彻底移除无障碍）**：
-  - 无需开启繁琐且容易被系统拦截的“无障碍服务”。
-  - 【AI走子】与【自动代走】直接在悬浮棋盘内部完成走子与推演，秒级响应，零权限负担。
-- 🧠 **Stockfish 18 智能引擎深度分析**：
-  - 异步协程后台深度计算，实时高亮推荐走法起点（绿色框）、目标点（蓝色框）及战术进攻方向箭头。
-- 🔄 **第一人称代打原则（黑白视角翻转自适应）**：
-  - **AI 永远只操控屏幕下方的我方棋子**。
-  - 默认视角（白在下）：AI 执白棋并走下方白棋；点击【翻转】后（黑在下），AI 自动转为**执黑棋**并走下方黑棋！
+  - **顶部固定状态栏**：紧凑固定于屏幕顶端，实时显示执棋方、模式、最佳走法（如 `e2 -> e4`）与评分（如 `+1.85` / `杀棋 #2`）。
+  - **自由拖拽拉伸棋盘**：半透明背景不遮挡画面，按住顶部把手可拖动对齐任意 App，按住右下角手柄可随意无级拉伸缩放。
+  - **可折叠悬浮快捷球**：展开即呈现 10 大功能面板，**展开状态下按住标题栏仍可自由拖动全屏停靠**。
+- 🚀 **纯净免权限架构（彻底移除无障碍）**：
+  - 无需开启繁琐且容易被系统拦截的“无障碍服务”。【AI走子】与【自动代走】直接在棋盘内部完成走子与推演，秒级响应，零权限负担。
 - 🎨 **双模式交互与沙盒排局**：
   - 支持 **“点击选子 $\to$ 点击目标格落子/吃子”** 与 **“按住棋子自由拖动落子”** 两种交互。
   - 开启沙盒模式后，支持跨规则任意挪子、任意吃子，方便极速摆谱复盘。
 - 👁️ **一键收起/显示棋盘**：
   - 快捷面板提供专属【隐藏棋盘】按钮，随时收起棋盘悬浮窗以全面观察底层界面，再次点击原位复原。
+
+---
+
+## 🎯 引擎满血算力与自定义棋力
+
+在 APP 主界面的 **【🎯 Stockfish 棋力与算力调节】** 卡片中，用户可自由选择适合自己的对弈强度：
+
+| 棋力预设档位 | 对应 ELO | Skill Level | 搜索深度 (Depth) | 思考时间 | 线程与置换表 | 适合场景 |
+| :--- | :---: | :---: | :---: | :---: | :---: | :--- |
+| ⚡ **特级宗师 (默认/最高)** | **3500+** | **20 (满级)** | **22+** | **1000ms** | 4 线程 / 64MB | 绝境破局 · 极限神之一手 · 残局必杀 |
+| 🏆 **国际大师 (大师水准)** | **2400** | 18 | 16 | 600ms | 2 线程 / 32MB | 专业竞技复盘 · 高手切磋对弈 |
+| 🥇 **俱乐部进阶 (进阶对战)** | **1800** | 12 | 12 | 400ms | 2 线程 / 16MB | 业余棋手练兵 · 中局战术进阶 |
+| 🎮 **新手休闲 (轻松娱乐)** | **1200** | 5 | 8 | 200ms | 1 线程 / 16MB | 初学者入门 · 基础规则演练 |
 
 ---
 
@@ -86,7 +104,7 @@
 | 🔄 | **重置开局** | 将棋盘一键复位至标准 8x8 开局状态 |
 | ✏️ | **自由沙盒** | 开启/关闭自由摆子模式（支持任意跨规则挪子与吃子） |
 | ⇄ | **切换回合** | 强制切换走棋方（白棋回合 $\leftrightarrow$ 黑棋回合） |
-| 🔃 | **翻转视角** | 黑白视角上下对调（执黑棋时使用，AI 自动接管黑棋） |
+| 🔃 | **翻转视角** | 黑白视角上下对调（执黑棋时使用，AI 自动同步转为只执黑棋） |
 | ↩️ | **撤销走子** | 回退上一步落子记录并恢复历史局面 |
 | ⚡ | **AI走子** | 触发 Stockfish 18 计算并立即在棋盘上执行推荐走法 |
 | 🤖 | **自动代走** | 开启连续托管循环，轮到我方回合时自动计算并持续走子 |
@@ -102,7 +120,8 @@
 - 从 [Releases](https://github.com/LinHouYu/chess_H4ck_Android/releases) 页面下载最新的 `app-debug.apk` 并安装到 Android 设备中。
 - 首次打开应用时，点击 **【去授权】** 并允许 **悬浮窗权限**（在其他应用上层显示）。
 
-### 2. 启动悬浮辅助
+### 2. 调节棋力与启动
+- 在主界面选择您期望的棋力档位（默认为 ⚡ 特级宗师）。
 - 点击主界面正中的 **【♟ 启动悬浮辅助】** 按钮。
 - 此时屏幕上方将出现 **顶部状态栏**，中间出现 **半透明棋盘**，右侧出现 **悬浮菜单球**。
 
@@ -149,22 +168,25 @@ chess_H4ck_Android/
 │   ├── src/main/
 │   │   ├── java/com/linhouyu/chess_h4ck/
 │   │   │   ├── core/
-│   │   │   │   ├── engine/          # Stockfish 18 高并发计算与 PST 剪枝引擎
+│   │   │   │   ├── config/          # 棋力预设、参数持久化 (EnginePreferences)
+│   │   │   │   ├── engine/          # 官方 Stockfish 18 原生进程 UCI 包装器 (StockfishEngine)
 │   │   │   │   ├── model/           # 棋子、棋盘格子与移动模型
 │   │   │   │   └── state/           # 棋盘状态机 (FEN 解析、沙盒、历史撤销)
 │   │   │   ├── service/
-│   │   │   │   └── OverlayService.kt # 前台悬浮窗协调服务
+│   │   │   │   └── OverlayService.kt # 前台悬浮窗协调服务 (严格敌我隔离调度)
 │   │   │   ├── ui/
 │   │   │   │   ├── overlay/         # 三大悬浮窗组件 (StatusBar, Chessboard, FloatingMenu)
 │   │   │   │   ├── view/            # 自定义动画 View (ChessSnowFallingView 飘雪粒子)
-│   │   │   │   └── MainActivity.kt  # 启动主界面
+│   │   │   │   └── MainActivity.kt  # 启动主界面 (棋力调节与权限管理)
 │   │   │   └── util/                # 屏幕与格子坐标几何换算工具
 │   │   ├── res/
 │   │   │   ├── drawable/            # 毛玻璃背景、专属 Vector SVG 图标、原版 App Logo
 │   │   │   ├── layout/              # 主界面及各大悬浮窗布局 XML
 │   │   │   └── mipmap-*/            # 全套多分辨率 App Launcher 图标
+│   │   ├── jniLibs/                 # 官方 Stockfish 18 原生二进制 (arm64-v8a / armeabi-v7a)
+│   │   ├── assets/                  # Stockfish 二进制备用释放源
 │   │   └── AndroidManifest.xml      # 清单配置文件 (悬浮窗与前台服务权限)
-│   └── build.gradle.kts             # 模块构建脚本
+│   └── build.gradle.kts             # 模块构建脚本 (NDK abiFilters 与 jniLibs 打包)
 ├── README.md                        # 本项目文档说明
 └── build.gradle.kts                 # 根项目配置
 ```
@@ -183,6 +205,6 @@ chess_H4ck_Android/
 ---
 
 <div align="center">
-  <sub>Designed & Developed with ❤️ by LinHouYu · Powered by Stockfish 18 Engine</sub><br />
+  <sub>Designed & Developed with ❤️ by LinHouYu · Powered by Official Stockfish 18 C++ Engine</sub><br />
   <sub>📱 Android Version: <a href="https://github.com/LinHouYu/chess_H4ck_Android">chess_H4ck_Android</a> · 💻 Windows Version: <a href="https://github.com/LinHouYu/chess_H4ck_Windows/tree/main">chess_H4ck_Windows</a></sub>
 </div>

@@ -8,12 +8,15 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.widget.Button
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.linhouyu.chess_h4ck.R
+import com.linhouyu.chess_h4ck.core.config.SkillPreset
 import com.linhouyu.chess_h4ck.service.OverlayService
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +24,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tvOverlayStatus: TextView
     private lateinit var btnGrantOverlay: Button
     private lateinit var btnToggleService: Button
+    private lateinit var rgSkillPreset: RadioGroup
+
+    private lateinit var rbGrandmaster: RadioButton
+    private lateinit var rbMaster: RadioButton
+    private lateinit var rbAdvanced: RadioButton
+    private lateinit var rbCasual: RadioButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,6 +38,15 @@ class MainActivity : AppCompatActivity() {
         tvOverlayStatus = findViewById(R.id.tvOverlayStatus)
         btnGrantOverlay = findViewById(R.id.btnGrantOverlay)
         btnToggleService = findViewById(R.id.btnToggleService)
+        rgSkillPreset = findViewById(R.id.rgSkillPreset)
+
+        rbGrandmaster = findViewById(R.id.rbGrandmaster)
+        rbMaster = findViewById(R.id.rbMaster)
+        rbAdvanced = findViewById(R.id.rbAdvanced)
+        rbCasual = findViewById(R.id.rbCasual)
+
+        // Load saved skill preset
+        initSkillPresetUi()
 
         // Request Notification permission on Android 13+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -80,6 +98,28 @@ class MainActivity : AppCompatActivity() {
             }
 
             tvOverlayStatus.postDelayed({ updateUiState() }, 300)
+        }
+    }
+
+    private fun initSkillPresetUi() {
+        val savedPreset = SkillPreset.getSavedPreset(this)
+        when (savedPreset) {
+            SkillPreset.GRANDMASTER -> rbGrandmaster.isChecked = true
+            SkillPreset.MASTER -> rbMaster.isChecked = true
+            SkillPreset.ADVANCED -> rbAdvanced.isChecked = true
+            SkillPreset.CASUAL -> rbCasual.isChecked = true
+        }
+
+        rgSkillPreset.setOnCheckedChangeListener { _, checkedId ->
+            val selectedPreset = when (checkedId) {
+                R.id.rbGrandmaster -> SkillPreset.GRANDMASTER
+                R.id.rbMaster -> SkillPreset.MASTER
+                R.id.rbAdvanced -> SkillPreset.ADVANCED
+                R.id.rbCasual -> SkillPreset.CASUAL
+                else -> SkillPreset.GRANDMASTER
+            }
+            SkillPreset.savePreset(this, selectedPreset)
+            Toast.makeText(this, "已切换棋力: ${selectedPreset.title}", Toast.LENGTH_SHORT).show()
         }
     }
 
